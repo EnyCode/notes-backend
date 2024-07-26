@@ -5,7 +5,7 @@ use std::str::FromStr;
 use crate::rocket::tokio::io::AsyncReadExt;
 use regex::Regex;
 use rocket::fs::TempFile;
-use rtf_parser::{document::RtfDocument, lexer::Lexer, parser::StyleBlock, tokens::Token};
+use rtf_parser::{document::RtfDocument, parser::StyleBlock};
 
 #[get("/")]
 async fn index() -> &'static str {
@@ -26,12 +26,14 @@ async fn upload(note: &str, file: TempFile<'_>) -> String {
 
     rst = (*re.replace_all(&rst, "")).to_string();
 
-    let doc = match RtfDocument::try_from(rst) {
+    let doc = match RtfDocument::try_from(rst.clone()) {
         Ok(doc) => doc,
         Err(_) => return String::from_str("Error parsing RTF").unwrap(),
     };
 
-    println!("{:#?}", doc.get_text());
+    println!("-------------------------");
+    println!("{}", rst);
+    println!("-------------------------");
     println!("{}", doc_to_md(doc).await);
 
     return format!("{:#?}", "hey");
@@ -46,6 +48,13 @@ fn token_to_md(token: &StyleBlock) -> String {
     let start = &text[..(text.len() - trimmed_start.len())];
     let end = &text[trimmed_end.len()..text.len()];
 
+    let header = match token.painter.font_size {
+        56 => "# ",
+        44 => "## ",
+        _ => "",
+    }
+    .to_string();
+
     let mut prefixsuffix = String::new();
 
     if token.painter.bold {
@@ -55,11 +64,21 @@ fn token_to_md(token: &StyleBlock) -> String {
         prefixsuffix.push_str("*");
     }
 
-    println!(":{}: :{}: and {} ({})", start, end, prefixsuffix, trimmed);
+    if header != "" {
+        prefixsuffix.clear();
+    }
+
+    if trimmed.contains("•") {
+        println!("{} {:?}", trimmed, token.paragraph);
+    } else {
+        println!("{} bad :{:?}", trimmed, token.paragraph);
+    }
+
+    //println!(":{}: :{}: and {} ({})", start, end, prefixsuffix, trimmed);
 
     format!(
-        "{}{}{}{}{}",
-        start, prefixsuffix, trimmed, prefixsuffix, end
+        "{}{}{}{}{}{}",
+        start, header, prefixsuffix, trimmed, prefixsuffix, end
     )
 }
 
