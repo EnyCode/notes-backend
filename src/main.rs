@@ -31,12 +31,12 @@ async fn upload(note: &str, file: TempFile<'_>) -> String {
         Err(_) => return String::from_str("Error parsing RTF").unwrap(),
     };
 
-    println!("-------------------------");
-    println!("{}", rst);
-    println!("-------------------------");
-    println!("{}", doc_to_md(doc).await);
+    //println!("-------------------------");
+    //println!("{}", rst);
+    //println!("-------------------------");
+    //println!("{}", doc_to_md(doc).await);
 
-    return format!("{:#?}", "hey");
+    return format!("{}", doc_to_md(doc).await);
 }
 
 fn token_to_md(token: &StyleBlock) -> String {
@@ -66,12 +66,6 @@ fn token_to_md(token: &StyleBlock) -> String {
 
     if header != "" {
         prefixsuffix.clear();
-    }
-
-    if trimmed.contains("•") {
-        println!("{} {:?}", trimmed, token.paragraph);
-    } else {
-        println!("{} bad :{:?}", trimmed, token.paragraph);
     }
 
     //println!(":{}: :{}: and {} ({})", start, end, prefixsuffix, trimmed);
