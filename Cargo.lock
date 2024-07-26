@@ -617,6 +617,7 @@ dependencies = [
 name = "notes-api"
 version = "0.1.0"
 dependencies = [
+ "regex",
  "rocket",
  "rtf-grimoire",
  "rtf-parser",
