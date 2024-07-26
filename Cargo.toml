@@ -1,0 +1,9 @@
+[package]
+name = "notes-api"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+rocket = { version = "0.5.1", features = ["json"] }
+rtf-grimoire = "0.2.1"
+rtf-parser = "0.3.0"
